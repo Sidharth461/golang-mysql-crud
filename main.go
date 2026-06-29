@@ -22,7 +22,7 @@ type User struct {
 
 var db *sql.DB
 
-func GetUsers(w http.ResponseWriter, r *http.Request) { /// ~this is my get request of mysql yeah i done it
+func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("GetUsers called")
 	rows, err := db.Query("SELECT id, name, email, contact_number FROM users")
@@ -37,7 +37,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) { /// ~this is my get requ
 		var u User
 		err := rows.Scan(&u.Id, &u.Name, &u.Email, &u.ContactNumber)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError) //improvement
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		if err = rows.Err(); err != nil {
@@ -49,7 +49,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) { /// ~this is my get requ
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(users)
 }
-func PostUsers(w http.ResponseWriter, r *http.Request) { ///!! this is my post Request of mysql yeahh i done it
+func PostUsers(w http.ResponseWriter, r *http.Request) {
 	var u User
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
