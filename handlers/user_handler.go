@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/Sidharth461/crud-mysql-go/database"
 	"github.com/Sidharth461/crud-mysql-go/models"
@@ -63,6 +64,10 @@ func PostUsers(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	if strings.TrimSpace(u.Name) == "" {
+		http.Error(w, "Name is Required", http.StatusBadRequest)
+		return
+	}
 	result, err := database.DB.Exec(
 		"INSERT INTO users (name, email, contact_number) VALUES (?, ?, ?)",
 		u.Name,
@@ -78,12 +83,14 @@ func PostUsers(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	w.Header().Set("Content-Type", "application/json")
+
+	response := map[string]interface{}{
+		"message": "User created successfully",
+		"id":      id,
 	}
-	fmt.Fprintf(w, "user created successfully with id %d and rowsAffected =%d", id, rowsAffected)
+
+	json.NewEncoder(w).Encode(response)
 
 }
 
@@ -116,7 +123,18 @@ func UpdateUsers(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprintf(w, "Updated SuccessFully and Rows Affected =%d", rowsAffected)
+	if rowsAffected == 0 {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+
+	response := map[string]interface{}{
+		"message": "User updated successfully",
+		"id":      idInt,
+	}
+
+	json.NewEncoder(w).Encode(response)
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
@@ -143,5 +161,12 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "user Not Found", http.StatusNotFound)
 		return
 	}
-	fmt.Fprint(w, "User deleted Successfully")
+	w.Header().Set("Content-Type", "application/json")
+
+	response := map[string]interface{}{
+		"message": "User deleted successfully",
+		"id":      idInt,
+	}
+
+	json.NewEncoder(w).Encode(response)
 }
