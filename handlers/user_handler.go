@@ -9,6 +9,7 @@ import (
 
 	"github.com/Sidharth461/crud-mysql-go/database"
 	"github.com/Sidharth461/crud-mysql-go/models"
+	"github.com/go-chi/chi/v5"
 )
 
 func UsersHandler(w http.ResponseWriter, r *http.Request) {
@@ -68,6 +69,18 @@ func PostUsers(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Name is Required", http.StatusBadRequest)
 		return
 	}
+	if strings.TrimSpace(u.Email) == "" {
+		http.Error(w, "Email is required", http.StatusBadRequest)
+		return
+	}
+	if !strings.Contains(u.Email, "@") {
+		http.Error(w, "Invalid email", http.StatusBadRequest)
+		return
+	}
+	if !strings.Contains(u.Email, ".") {
+		http.Error(w, "Invalid email", http.StatusBadRequest)
+		return
+	}
 	result, err := database.DB.Exec(
 		"INSERT INTO users (name, email, contact_number) VALUES (?, ?, ?)",
 		u.Name,
@@ -95,7 +108,8 @@ func PostUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateUsers(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
+	// id := r.URL.Query().Get("id")
+	id := chi.URLParam(r, "id")
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -138,7 +152,8 @@ func UpdateUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
-	id := r.URL.Query().Get("id")
+	// id := r.URL.Query().Get("id")
+	id := chi.URLParam(r, "id")
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
