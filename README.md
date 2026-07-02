@@ -85,8 +85,8 @@ go run main.go
 | ------ | ----------- | ----------- |
 | POST   | /users      | Create User |
 | GET    | /users      | Get Users   |
-| PUT    | /users?id=1 | Update User |
-| DELETE | /users?id=1 | Delete User |
+| PUT    | /users/1    | Update User |
+| DELETE | /users/1    | Delete User |
 
 ## Author
 
